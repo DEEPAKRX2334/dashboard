@@ -14,6 +14,34 @@ Users can:
 
 ---
 
+## Screenshots
+
+### Dashboard View
+
+![Dashboard](./screenshots/dashboard.png)
+
+### Frontend Running
+
+![Frontend](./screenshots/frontendrun.png)
+
+### Configure Dashboard
+
+![Configure](./screenshots/dashboardconfig.png)
+
+### Backend Running
+
+![Backend](./screenshots/backendruning.png)
+
+### Database Tables
+
+![Database](./screenshots/database.png)
+
+### Orders Page
+
+![Orders](./screenshots/orderpage.png)
+
+---
+
 ## Tech Stack
 
 ### Frontend
@@ -46,36 +74,32 @@ Users can:
 ---
 
 ## Project Structure
-
 ```
 halleyx-dashboard/
 
 frontend/
-  src/
-    components/
-    pages/
-    services/
-    styles/
-    widgets/
+src/
+components/
+pages/
+services/
+styles/
+widgets/
 
 backend/
-  controller/
-  service/
-  repository/
-  model/
-  dto/
+controller/
+service/
+repository/
+model/
+dto/
 ```
-
 ---
 
 ## How to Run
 
 ### Backend
 
-```
 cd backend
 mvn spring-boot:run
-```
 
 Runs on: http://localhost:8080
 
@@ -83,11 +107,9 @@ Runs on: http://localhost:8080
 
 ### Frontend
 
-```
 cd frontend
 npm install
 npm run dev
-```
 
 Runs on: http://localhost:5173
 
