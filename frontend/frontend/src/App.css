@@ -1,0 +1,149 @@
+/* ================= THEME ================= */
+
+:root{
+--bg:#f4f6f9;
+--card:#ffffff;
+--text:#111;
+--border:#e5e7eb;
+--glass:rgba(255,255,255,0.6);
+}
+
+[data-theme="dark"]{
+--bg:#0f172a;
+--card:#1e293b;
+--text:#f1f5f9;
+--border:#334155;
+--glass:rgba(30,41,59,0.6);
+}
+
+/* ================= GLOBAL ================= */
+
+body{
+margin:0;
+font-family:"Inter",sans-serif;
+background:var(--bg);
+color:var(--text);
+transition:all 0.3s ease;
+}
+
+/* ================= GLASS CARD ================= */
+
+.dashboard-card{
+position:relative;
+padding:25px;
+border-radius:18px !important;
+background:var(--glass);
+backdrop-filter:blur(12px);
+border:1px solid var(--border);
+box-shadow:0 8px 30px rgba(0,0,0,0.08);
+transition:all 0.35s ease;
+overflow:hidden;
+cursor:pointer;
+}
+
+/* HOVER LIFT */
+.dashboard-card:hover{
+transform:translateY(-10px) scale(1.02);
+box-shadow:0 30px 60px rgba(0,0,0,0.25);
+}
+
+/* GLOW ANIMATION */
+.dashboard-card::before{
+content:"";
+position:absolute;
+top:0;
+left:-100%;
+width:100%;
+height:100%;
+background:linear-gradient(120deg,transparent,rgba(255,255,255,0.3),transparent);
+transition:0.6s;
+}
+
+.dashboard-card:hover::before{
+left:100%;
+}
+
+/* ================= KPI TEXT ================= */
+
+.dashboard-card h2{
+margin-top:8px;
+font-size:26px;
+font-weight:700;
+letter-spacing:1px;
+}
+
+/* ================= GRID ================= */
+
+.dashboard-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+
+/* ================= WIDGET ================= */
+
+.widget-header{
+display:flex;
+justify-content:space-between;
+margin-bottom:10px;
+}
+
+.widget-title{
+font-weight:600;
+font-size:15px;
+}
+
+.widget-sub{
+font-size:12px;
+opacity:0.7;
+}
+
+/* ================= SKELETON ================= */
+
+.skeleton{
+height:18px;
+border-radius:6px;
+background:linear-gradient(90deg,#eee,#ddd,#eee);
+background-size:200% 100%;
+animation:skeleton-loading 1.2s infinite linear;
+}
+
+@keyframes skeleton-loading{
+0%{background-position:200% 0}
+100%{background-position:-200% 0}
+}
+
+/* ================= BUTTON ================= */
+
+button{
+transition:all 0.2s ease;
+}
+
+button:hover{
+transform:scale(1.08);
+}
+
+/* ================= ENTRY ANIMATION ================= */
+
+.dashboard-card{
+animation:fadeUp 0.6s ease;
+}
+
+@keyframes fadeUp{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+.dashboard-grid{
+grid-template-columns:1fr;
+}
+}
