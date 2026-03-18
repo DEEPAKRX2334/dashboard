@@ -4,19 +4,29 @@ const API = axios.create({
   baseURL: "http://localhost:8080/api",
 });
 
-// ✅ KPI
-export const getKpi = () => API.get("/dashboard/kpi");
+// ✅ GET ORDERS
+export const getOrders = async () => {
+  const res = await API.get("/orders");
+  return res.data;
+};
 
-// ✅ Layout
-export const saveLayout = (data) =>
-  API.post("/dashboard/layout", data);
+// ✅ GET KPI
+export const getKPI = async () => {
+  const res = await API.get("/dashboard/kpi");
+  return res.data;
+};
 
-export const getLayout = () =>
-  API.get("/dashboard/layout");
+// ✅ SAVE LAYOUT
+export const saveLayout = async (layout) => {
+  return API.post("/dashboard/layout", {
+    layoutJson: JSON.stringify(layout),
+  });
+};
 
-// ✅ Orders (FIX ERROR HERE)
-export const getOrders = () =>
-  API.get("/orders");
+// ✅ GET LAYOUT
+export const getLayout = async () => {
+  const res = await API.get("/dashboard/layout");
+  return res.data;
+};
 
-// default export
 export default API;

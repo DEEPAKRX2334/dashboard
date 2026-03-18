@@ -1,46 +1,56 @@
 import { useEffect, useState } from "react";
 import { getOrders } from "../services/api";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState([]); // ✅ default empty array
 
   useEffect(() => {
-    getOrders().then((res) => setOrders(res.data));
+    getOrders()
+      .then((data) => {
+        // ✅ SAFETY CHECK
+        if (Array.isArray(data)) {
+          setOrders(data);
+        } else if (data?.data) {
+          setOrders(data.data);
+        } else {
+          setOrders([]); // fallback
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching orders:", err);
+        setOrders([]); // prevent crash
+      });
   }, []);
 
   return (
-    <div className="layout">
-      <Sidebar />
+    <div style={{ padding: "20px" }}>
+      <h2>Orders</h2>
 
-      <div className="main">
-        <Navbar />
+      <table border="1" cellPadding="10">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Product</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
 
-        <div className="content">
-          <h2>Orders</h2>
-
-          <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Product</th>
-                <th>Quantity</th>
+        <tbody>
+          {orders.length > 0 ? (
+            orders.map((o) => (
+              <tr key={o.id}>
+                <td>{o.id}</td>
+                <td>{o.product}</td>
+                <td>{o.quantity}</td>
               </tr>
-            </thead>
-
-            <tbody>
-              {orders.map((o) => (
-                <tr key={o.id}>
-                  <td>{o.id}</td>
-                  <td>{o.product}</td>
-                  <td>{o.quantity}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="3">No Data</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }

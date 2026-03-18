@@ -13,29 +13,70 @@ export default function Dashboard() {
 
   const [kpi, setKpi] = useState({ revenue: 0, orders: 0, users: 0 });
   const [orders, setOrders] = useState([]);
+  const [layout, setLayout] = useState([]);
 
   useEffect(() => {
     loadData();
+    loadLayout();
   }, []);
 
+  // ================= KPI + ORDERS =================
   const loadData = async () => {
     try {
       const kpiRes = await API.get("/dashboard/kpi");
-      setKpi(kpiRes.data || {});
-    } catch (e) {
-      console.log("KPI error");
+      setKpi(kpiRes?.data || {});
+    } catch {
+      setKpi({ revenue: 0, orders: 0, users: 0 });
     }
 
     try {
       const orderRes = await API.get("/orders");
-      setOrders(orderRes.data || []);
-    } catch (e) {
-      console.log("Orders error");
+      setOrders(Array.isArray(orderRes.data) ? orderRes.data : []);
+    } catch {
+      setOrders([]);
     }
   };
 
-  // 🔥 SAFE DATA (VERY IMPORTANT FIX)
-  const safeData = (orders && orders.length > 0)
+  // ================= FIXED LAYOUT =================
+  const loadLayout = async () => {
+    try {
+      const res = await API.get("/dashboard/layout");
+
+      console.log("LAYOUT RESPONSE 👉", res.data);
+
+      let layoutJson = null;
+
+      // 🔥 GET layoutJson
+      if (res.data?.layoutJson) {
+        layoutJson = res.data.layoutJson;
+      } else if (res.data?.data?.layoutJson) {
+        layoutJson = res.data.data.layoutJson;
+      }
+
+      if (!layoutJson) return;
+
+      // 🔥 PARSE STRING
+      const parsed = JSON.parse(layoutJson);
+
+      console.log("PARSED 👉", parsed);
+
+      // 🔥 IMPORTANT FIX
+      if (parsed.widgets && Array.isArray(parsed.widgets)) {
+        const formatted = parsed.widgets.map(w => ({
+          i: w.id || Date.now().toString(),
+          type: w.type
+        }));
+
+        setLayout(formatted);
+      }
+
+    } catch (e) {
+      console.log("❌ layout error", e);
+    }
+  };
+
+  // ================= SAFE DATA =================
+  const safeData = orders.length > 0
     ? orders.map(o => ({
         name: o.product || "Unknown",
         quantity: o.quantity || 0
@@ -59,8 +100,7 @@ export default function Dashboard() {
 
         <div className="content">
 
-          {/* 🔥 DEBUG TEXT (REMOVE AFTER) */}
-          <h2 style={{ color: "black" }}>Dashboard Working ✅</h2>
+          <h2>Dashboard</h2>
 
           {/* KPI */}
           <div className="kpi-container">
@@ -82,49 +122,79 @@ export default function Dashboard() {
 
           </div>
 
-          {/* CHARTS */}
-          <div className="charts">
+          {/* LIVE WIDGETS */}
+          <div style={{ marginTop: "30px" }}>
+            <h3>Live Widgets</h3>
 
-            <div className="chart-box">
-              <h3>Orders Bar Chart</h3>
+            <div style={{
+              display: "flex",
+              gap: "20px",
+              flexWrap: "wrap"
+            }}>
 
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={safeData}>
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="quantity" fill="#6366f1" />
-                </BarChart>
-              </ResponsiveContainer>
+              {layout.length === 0 && (
+                <p>No widgets added yet</p>
+              )}
+
+              {layout.map(item => (
+
+                <div key={item.i} style={{
+                  width: "300px",
+                  background: "white",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  boxShadow: "0 4px 10px rgba(0,0,0,0.1)"
+                }}>
+
+                  {item.type === "kpi" && (
+                    <div>
+                      <h4>KPI</h4>
+                      <p>Total Orders: {kpi?.orders ?? 0}</p>
+                    </div>
+                  )}
+
+                  {item.type === "bar" && (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <BarChart data={safeData}>
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="quantity" fill="#6366f1" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  )}
+
+                  {item.type === "pie" && (
+                    <ResponsiveContainer width="100%" height={200}>
+                      <PieChart>
+                        <Pie data={safeData} dataKey="quantity">
+                          {safeData.map((_, i) => (
+                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  )}
+
+                  {item.type === "table" && (
+                    <table style={{ width: "100%" }}>
+                      <tbody>
+                        {orders.map(o => (
+                          <tr key={o.id}>
+                            <td>{o.product}</td>
+                            <td>{o.quantity}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+
+                </div>
+              ))}
 
             </div>
-
-            <div className="chart-box">
-              <h3>Product Distribution</h3>
-
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-
-                  <Pie
-                    data={safeData}
-                    dataKey="quantity"
-                    nameKey="name"
-                    outerRadius={100}
-                    label
-                  >
-                    {safeData.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % 3]} />
-                    ))}
-                  </Pie>
-
-                  <Tooltip />
-                  <Legend />
-
-                </PieChart>
-              </ResponsiveContainer>
-
-            </div>
-
           </div>
 
         </div>
